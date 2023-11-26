@@ -1,0 +1,293 @@
+/* stylelint-disable selector-class-pattern */
+/* stylelint-disable custom-property-pattern */
+
+.CX3J {
+  --moduleHeight: 500px;
+  --moduleWidth: 400px;
+  --indexWidth: 60px;
+  --eventHeight: 16px;
+  --borderSize: 1px;
+  --mainBorderStyle: var(--borderSize) solid darkgray;
+  --subBorderStyle: var(--borderSize) dotted darkslategray;
+
+  height: var(--moduleHeight);
+}
+
+.CX3J .board {
+  display: grid;
+  height: var(--moduleHeight);
+  width: var(--moduleWidth);
+  grid-template:
+    "canton header"
+    "main main" 1fr
+    / var(--indexWidth) 1fr;
+}
+
+.CX3J .main {
+  grid-area: main;
+  display: grid;
+  height: 100%;
+  position: relative;
+  grid-template-columns: var(--indexWidth) repeat(var(--days), 1fr);
+  grid-template-rows: repeat(var(--periods), 1fr);
+  border-top: var(--mainBorderStyle);
+}
+
+.CX3J .headerContainer {
+  grid-area: header;
+  height: fit-content;
+  width: 100%;
+  position: relative;
+  border-right: var(--mainBorderStyle);
+  border-top: var(--mainBorderStyle);
+}
+
+.CX3J .headerContainer .headerBackground {
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--days), 1fr);
+}
+
+.CX3J .headerContainer .headerBackground .dayBackground {
+  box-sizing: border-box;
+  border-left: var(--mainBorderStyle);
+  border-bottom: var(--mainBorderStyle);
+}
+
+.CX3J .header {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--days), [daycell-start] 1fr [daycell-end]);
+  z-index: 2;
+}
+
+.CX3J .daycell {
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.CX3J .daycell * {
+  width: 100%;
+}
+
+.CX3J .daycell .dayTimeParts.literal,
+.CX3J .daycell .dayTimeParts.month {
+  display: none;
+}
+
+.CX3J .daycell .day {
+  font-weight: bold;
+  color: white;
+}
+
+.CX3J .daycell .weekday {
+  font-size: 0.75em;
+  text-transform: uppercase;
+  color: lightgray;
+}
+
+.CX3J .daycell.today .day {
+  color: gold;
+}
+
+.CX3J .daycell.weekend_1 .weekday {
+  color: dodgerblue;
+}
+
+.CX3J .daycell.weekend_2 .weekday {
+  color: crimson;
+}
+
+.CX3J .fulldayEvents {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(var(--days), [day-start] 1fr [day-end]);
+  grid-auto-flow: row dense;
+  min-height: 10px;
+  gap: 2px;
+  z-index: 2;
+  margin-bottom: 2px;
+}
+
+.CX3J .fulldayCell {
+  z-index: 1;
+  position: absolute;
+  border: var(--mainBorderStyle);
+  grid-row: 1 / -1;
+}
+
+.CX3J .canton {
+  grid-area: canton;
+}
+
+.CX3J .gridCell {
+  border-bottom: var(--subBorderStyle);
+  position: relative;
+  border-right: var(--mainBorderStyle);
+  box-sizing: border-box;
+}
+
+.CX3J .gridCell.odd {
+  border-bottom: var(--mainBorderStyle);
+}
+
+.CX3J .index.gridCell {
+  font-size: 0.5em;
+  border-right: var(--mainBorderStyle);
+  overflow: hidden;
+  text-align: right;
+}
+
+.CX3J .index.gridCell.odd {
+  color: transparent;
+}
+
+.CX3J .index.gridCell.now .time {
+  display: inherit;
+}
+
+.CX3J .event {
+  box-sizing: border-box;
+  font-size: 0.5em;
+  font-weight: bold;
+  color: var(--oppositeColor);
+  background-color: color-mix(in hsl, var(--calendarColor) 75%, transparent);
+  border-radius: 2px;
+  overflow: hidden;
+  text-align: left;
+  line-height: 100%;
+}
+
+.CX3J .event.single {
+  position: absolute;
+  top: var(--eventTop);
+  left: calc(var(--intersect) * 10px);
+  right: 5px;
+  border-radius: 5px;
+  height: max(calc((100% + var(--borderSize)) * var(--eventHeight)), 20%);
+  z-index: 2;
+  padding: 2px 5px;
+  border: 1px solid color-mix(in hsl, var(--calendarColor), white);
+}
+
+.CX3J .event .symbol {
+  margin-right: 2px;
+}
+
+.CX3J .event.single .symbol {
+  font-size: 1.5em;
+}
+
+.CX3J .event .headline {
+  font-size: 1em;
+  font-weight: bold;
+  display: flex;
+  align-items: baseline;
+}
+
+.CX3J .event .headline > * {
+  display: inline;
+}
+
+.CX3J .event .headline .title {
+  font-size: 1.2em;
+  margin-left: 5px;
+}
+
+.CX3J .event .time {
+  text-align: right;
+}
+
+.CX3J .event .location {
+  text-align: right;
+}
+
+.CX3J .event.continueToNext {
+  border-bottom: 2px dotted white;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.CX3J .event.continueFromPrev {
+  border-top: 2px dotted white;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.CX3J .event.notsingle {
+  border-radius: 5px;
+  grid-column: var(--eventStart) / var(--eventEnd);
+  font-size: 0.75em;
+  overflow: hidden;
+  line-height: 100%;
+  height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 5px;
+}
+
+.CX3J .event.notsingle .headline {
+  font-size: 1em;
+}
+
+.CX3J .event.notsingle .headline .title {
+  font-size: 0.8em;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  margin-left: 5px;
+}
+
+.CX3J .event.notsingle:not(.multiday) .endTime {
+  display: none;
+}
+
+.CX3J .event.notsingle:not(.fullday) .endTime {
+  order: 4;
+  margin-left: auto;
+}
+
+.CX3J .event.notsingle > *:not(.headline) {
+  display: none;
+}
+
+.CX3J .event.fullday .time {
+  display: none;
+}
+
+.CX3J .event.notsingle .time {
+  font-size: 0.75em;
+}
+
+.CX3J .nowIndicator {
+  --indicatorStyle: 1px dashed rgb(255 0 0 / 50%);
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: var(--nowHeight);
+  border-bottom: var(--indicatorStyle);
+  color: black;
+  font-size: 0.5em;
+  font-weight: bold;
+  text-align: center;
+}
+
+.CX3J .nowIndicator::after {
+  content: attr(data-time);
+  background-color: gold;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: var(--indexWidth);
+  height: fit-content;
+}
