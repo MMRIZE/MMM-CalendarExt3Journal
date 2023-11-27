@@ -127,7 +127,7 @@ All the properties are omittable, and if omitted, a default value will be applie
 
 ## Notification
 ### Incoming Notifications
-#### `CX3_CONFIG`, payload: {config}
+#### `CX3J_CONFIG`, payload: {config}
 - The current configuration value would be overridden by the receiving payload.
 - For example; the current config might be;
 ```js
@@ -144,9 +144,9 @@ When some external notification like below comes;
 ```js
 .sendNotification('CX3J_CONFIG', { calendarSet: ['EPL'], beginHour: 16 })
 ```
-Then, the view will be changed with those values. The unmentioned values would remain as before.
+Then, the view will be changed with those attributes. The unmentioned values would remain as before.
 
-#### `CX3_RESET`
+#### `CX3J_RESET`
 Return to the original config value .
 
 > I think these 2 notifications would be enough to control the module's view. This approach is a new way for my all CX3* modules. I'll change other CX3* modules in this way later.
