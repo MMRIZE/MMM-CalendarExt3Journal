@@ -27,17 +27,17 @@ Module.register('MMM-CalendarExt3Journal', {
     },
     refreshInterval: 1000 * 60 * 10,
     waitFetch: 1000 * 5,
-    animationSpeed: 100,
-    animatedIn: null,
-    animatedOut: null,
+    animationSpeed: 1000,
+    animatedIn: null, // reserved
+    animatedOut: null, // reserved
     calendarSet: [],
     eventFilter: null,
     eventTransformer: null,
     preProcessor: null,
     useSymbol: true,
     notification: 'CALENDAR_EVENTS',
-    maxIntersect: 3, // max number of events to show in a column
-    displayLegend: false,
+    //maxIntersect: 3, // max number of events to show in a column
+    //displayLegend: false,
     firstDayOfWeek: null,
     minimalDaysOfNewYear: null,
     weekends: [],
@@ -318,6 +318,7 @@ Module.register('MMM-CalendarExt3Journal', {
     const { renderEventJournal, renderEventAgenda } = this.library
     const periods = Array.from(dom.querySelectorAll('.cell')).map(cell => cell.dataset.isoString)
     for (let event of single) {
+      if (event?.skip) continue
       let startPoint = new Date(+event.vStartDate)
       startPoint.setMinutes((startPoint.getMinutes() < 30) ? 0 : 30)
       startPoint.setSeconds(0)
@@ -337,7 +338,6 @@ Module.register('MMM-CalendarExt3Journal', {
       if (event?.continueFromPrev) eDom.classList.add('continueFromPrev')
       if (event?.continueToNext) eDom.classList.add('continueToNext')
       cell.appendChild(eDom)
-      // ???
     }
 
     const dateRange = Array.from(dom.querySelectorAll('.daycell')).map((cell, index) => {
@@ -350,6 +350,7 @@ Module.register('MMM-CalendarExt3Journal', {
 
     const fsDom = dom.querySelector('.fulldayEvents')
     for (let event of fullday) {
+      if (event?.skip) continue
       let startDate = new Date(+event.startDate)
       let endDate = new Date(+event.endDate)
       let startDay = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())

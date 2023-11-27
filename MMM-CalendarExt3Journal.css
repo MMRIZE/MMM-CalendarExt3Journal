@@ -2,15 +2,13 @@
 /* stylelint-disable custom-property-pattern */
 
 .CX3J {
-  --moduleHeight: 500px;
-  --moduleWidth: 400px;
+  --moduleHeight: 800px;
+  --moduleWidth: 100%;
   --indexWidth: 60px;
   --eventHeight: 16px;
   --borderSize: 1px;
   --mainBorderStyle: var(--borderSize) solid darkgray;
   --subBorderStyle: var(--borderSize) dotted darkslategray;
-
-  height: var(--moduleHeight);
 }
 
 .CX3J .board {
