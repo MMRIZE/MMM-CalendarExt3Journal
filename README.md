@@ -169,7 +169,7 @@ You can handle almost all of the visual things with CSS. See the `MMM-CalendarEx
   --subBorderStyle: var(--borderSize) dotted darkslategray;
 }
 ```
-The most commonly used values would be defined in `.CX3J` selector as variables. 
+The most commonly used values would be defined in `.CX3J` selector as variables.
 - `moduleHeight` and `-moduleWidth` will be set by configuration value `height` and `width` for your convenience.
 
 
@@ -237,19 +237,19 @@ preProcessor: (ev) => {
   return ev
 }
 ```
-This example shows 
+This example shows
 
 1) if the title of an event has "test", drop the event off
 
 2) then add 2 hours to the start time of events on the specific calendar.
 
-Unlike eventTransformer, the preProcessor would be applied to raw data format of events from the default calendar module or equivalent after receiving notification. 
+Unlike eventTransformer, the preProcessor would be applied to raw data format of events from the default calendar module or equivalent after receiving notification.
 
 This is the better place to adjust the event itself to make it compatible with this module before the main logic of the module handle and regularize events.
 
 
 ### skip to draw
-if an `evnet` has `.skip: true` attribute as a property, this event will not be rendered on the screen. However, it will remain in the data, so you can sort, filter or use that event. 
+if an `evnet` has `.skip: true` attribute as a property, this event will not be rendered on the screen. However, it will remain in the data, so you can sort, filter or use that event.
 
 Generally, this attribute will not derived from the original calendar provider(e.g. default calendar module). You may need to assign the value by yourself with event-handling.
 
@@ -272,7 +272,7 @@ calendars: [
 ],
 ```
 
-**WARNING** 
+**WARNING**
 To use `iconify`, you should set `defaultSymbolClassName: '',` in your default calendar module. Ususally, it is enough when you hide the original default calendar module to use with CX3*. But if you want to use font-awesome icons together, you should add font-awesome class names (e.g `fa`, `fas`, `fa-calendar-check`...) by yourself.
 
 
@@ -281,6 +281,11 @@ To use `iconify`, you should set `defaultSymbolClassName: '',` in your default c
 
 
 ## Latest Updates
+### 1.0.1 (2024-04-29)
+- **FIXED** : MM's repeated singleday timezone issue
+- **ADDED** : CSS selector for day cells. (e.g. `.today`, ...)
+- **UPDATED** : more stable CX3_Shared structure
+
 ### 1.0.0 (2023-11-27)
 - Released.
 
@@ -302,4 +307,3 @@ To use `iconify`, you should set `defaultSymbolClassName: '',` in your default c
 - Seongnoh Yi (eouia0819@gmail.com)
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Y8Y56IFLK)
-

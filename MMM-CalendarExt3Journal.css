@@ -289,3 +289,18 @@
   width: var(--indexWidth);
   height: fit-content;
 }
+
+.CX3J .headerBackground .dayBackground.today {
+  border-top: 2px solid gold;
+  border-left: 2px solid gold;
+  border-right: 2px solid gold;
+}
+
+.CX3J .cell.today {
+  border-left: 2px solid gold;
+  border-right: 2px solid gold;
+}
+
+.CX3J .cell.today.last {
+  border-bottom: 2px solid gold;
+}

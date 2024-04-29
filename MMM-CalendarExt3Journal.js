@@ -97,7 +97,7 @@ Module.register('MMM-CalendarExt3Journal', {
       this._ready = true
       this.library.prepareMagic()
       let { payload, sender } = result[ 1 ].value
-      this.fetch(payload, sender)
+      this.fetch(payload, sender, this.activeConfig)
       this._firstDataFetched()
     })
 
@@ -105,21 +105,13 @@ Module.register('MMM-CalendarExt3Journal', {
       setTimeout(() => {
         this.updateView({ ...this.activeConfig })
       }, this.config.waitFetch)
-
     })
   },
 
 
   notificationReceived: function(notification, payload, sender) {
     if (notification === this.config.notification) {
-      if (this?.storedEvents?.length == 0 && payload.length > 0) {
-        this._receiveFirstData({payload, sender})
-      }
-      if (this?.library?.loaded) {
-        this.fetch(payload, sender)
-      } else {
-        Log.warn('[CX3J] Module is not prepared yet, wait a while.')
-      }
+      this.fetch(payload, sender, this.activeConfig)
     }
 
     if (notification === 'DOM_OBJECTS_CREATED') {
@@ -137,13 +129,9 @@ Module.register('MMM-CalendarExt3Journal', {
     }
   },
 
-  fetch: function(payload, sender) {
-    this.storedEvents = this.library.regularizeEvents({
-      eventPool: this.eventPool,
-      payload,
-      sender,
-      config: this.config
-    })
+  fetch: function (payload, sender, options) {
+    this.eventPool.set(sender.identifier, JSON.parse(JSON.stringify(payload)))
+    this.updateView(options)
   },
 
   updateView: function (options) {
@@ -185,6 +173,31 @@ Module.register('MMM-CalendarExt3Journal', {
       (staticTime) ? beginHour : today.getHours() + beginHour,
     )
 
+    const assignDayClass = (dom, day, options) => {
+      if (isToday(day)) dom.classList.add('today')
+      if (isThisMonth(day)) dom.classList.add('thisMonth')
+      if (isThisYear(day)) dom.classList.add('thisYear')
+      const weekends = isWeekend(day, options)
+      if (weekends > -1) dom.classList.add('weekend', 'weekend_' + (weekends + 1))
+
+      dom.dataset.isoString = day.toISOString()
+      dom.dataset.dateValue = day.valueOf()
+      dom.dataset.dateString = new Date(day.valueOf()).toISOString().split('T')[0]
+      return dom
+    }
+
+    const assignGridClass = (dom, m, options) => {
+      dom.dataset.isoString = m.toISOString()
+      if (isToday(m)) dom.classList.add('today')
+      if (isThisMonth(m)) dom.classList.add('thisMonth')
+      if (isThisYear(m)) dom.classList.add('thisYear')
+      const weekends = isWeekend(m, options)
+      if (weekends > -1) dom.classList.add('weekend', 'weekend_' + (weekends + 1))
+      dom.dataset.hour = m.getHours()
+      dom.dataset.minute = m.getMinutes()
+      return dom
+    }
+
     const board = document.createElement('div')
     board.classList.add('board')
     board.style.setProperty('--days', days)
@@ -196,8 +209,11 @@ Module.register('MMM-CalendarExt3Journal', {
     const headerBackground = document.createElement('div')
     headerBackground.classList.add('headerBackground')
     for (let i = 0; i < days; i++) {
+      let d = new Date(startDay.valueOf())
+      d.setDate(d.getDate() + i)
       let daybackground = document.createElement('div')
       daybackground.classList.add('dayBackground')
+      daybackground = assignDayClass(daybackground, d, options)
       headerBackground.appendChild(daybackground)
     }
 
@@ -211,14 +227,7 @@ Module.register('MMM-CalendarExt3Journal', {
       day.setDate(day.getDate() + i)
       let dayDom = document.createElement('div')
       dayDom.classList.add('daycell')
-      if (isToday(day)) dayDom.classList.add('today')
-      if (isThisMonth(day)) dayDom.classList.add('thisMonth')
-      if (isThisYear(day)) dayDom.classList.add('thisYear')
-      const weekends = isWeekend(day, options)
-      if (weekends > -1) dayDom.classList.add('weekend', 'weekend_' + (weekends + 1))
-
-      dayDom.dataset.isoString = day.toISOString()
-      dayDom.dataset.date = day.valueOf()
+      dayDom = assignDayClass(dayDom, day, options)
       dayDom.innerHTML = new Intl.DateTimeFormat(options.locale, options.dateHeaderOptions).formatToParts(day)
         .reduce((prev, cur, curIndex, arr) => {
         prev = prev + `<span class="dayTimeParts ${cur.type} seq_${curIndex}">${cur.value}</span>`
@@ -264,7 +273,9 @@ Module.register('MMM-CalendarExt3Journal', {
         cm.setDate(cm.getDate() + j)
         let cell = document.createElement('div')
         cell.classList.add('cell', 'gridCell', (even) ? 'even' : 'odd', (current) ? 'now' : 'notnow')
-        cell.dataset.isoString = cm.toISOString()
+        if (i === 0) cell.classList.add('first')
+        if (i === (hourLength * 2) - 1) cell.classList.add('last')
+        cell = assignGridClass(cell, cm, options)
         main.appendChild(cell)
       }
     }
@@ -313,9 +324,16 @@ Module.register('MMM-CalendarExt3Journal', {
   },
 
   drawEvents: function (dom, options, startObj) {
-    if (!this.storedEvents?.length || !this.library?.loaded) return dom
-    const { fullday, single } = this.regularize(this.storedEvents, options, startObj)
-    const { renderEventJournal, renderEventAgenda } = this.library
+    if (!this.library?.loaded) return dom
+    const { regularizeEvents, renderEventJournal, renderEventAgenda } = this.library
+
+    const targetEvents = regularizeEvents({
+      eventPool: this.eventPool,
+      config: options,
+    })
+
+    const { fullday, single } = this.regularize(targetEvents, options, startObj)
+
     const periods = Array.from(dom.querySelectorAll('.cell')).map(cell => cell.dataset.isoString)
     for (let event of single) {
       if (event?.skip) continue
@@ -341,7 +359,7 @@ Module.register('MMM-CalendarExt3Journal', {
     }
 
     const dateRange = Array.from(dom.querySelectorAll('.daycell')).map((cell, index) => {
-      const t = new Date(+cell.dataset.date)
+      const t = new Date(+cell.dataset.dateValue)
       return {
         index,
         date: new Date(t.getFullYear(), t.getMonth(), t.getDate())
@@ -373,7 +391,7 @@ Module.register('MMM-CalendarExt3Journal', {
     const startDateWindow = new Date(startDay.getFullYear(), startDay.getMonth(), startDay.getDate())
     const endDateWindow = new Date(startDay.getFullYear(), startDay.getMonth(), startDay.getDate() + options.days)
     const prepared = prepareEvents({
-      storedEvents: calendarFilter(events, options.calendarSet),
+      targetEvents: calendarFilter(events, options.calendarSet),
       config: options,
       range: [ startDateWindow.valueOf(), endDateWindow.valueOf() ],
     })
@@ -388,7 +406,7 @@ Module.register('MMM-CalendarExt3Journal', {
     }, [ [], [] ])
 
     const result = eventsByDate({
-      storedEvents: singleEvents,
+      targetEvents: singleEvents,
       config: options,
       startTime: startDay,
       dayCounts: options.days,
