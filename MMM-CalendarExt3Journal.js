@@ -389,7 +389,8 @@ Module.register('MMM-CalendarExt3Journal', {
     const { eventsByDate, prepareEvents, calendarFilter } = this.library
 
     const startDateWindow = new Date(startDay.getFullYear(), startDay.getMonth(), startDay.getDate())
-    const endDateWindow = new Date(startDay.getFullYear(), startDay.getMonth(), startDay.getDate() + options.days)
+    const endDateWindow = new Date(startDay.getFullYear(), startDay.getMonth(), startDay.getDate() + parseInt(options.days))
+
     const prepared = prepareEvents({
       targetEvents: calendarFilter(events, options.calendarSet),
       config: options,
@@ -411,6 +412,7 @@ Module.register('MMM-CalendarExt3Journal', {
       startTime: startDay,
       dayCounts: options.days,
     })
+
     let regularized = []
     for (let { date, events } of result) {
       const singleRanged = []
