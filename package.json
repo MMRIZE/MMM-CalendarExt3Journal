@@ -38,6 +38,6 @@
     "@eslint/markdown": "^8.0.1",
     "commit-and-tag-version": "^12.7.1",
     "eslint": "^10.3.0",
-    "globals": "^17.6.0"
+    "globals": "^17.7.0"
   }
 }
